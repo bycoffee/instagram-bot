@@ -1,82 +1,110 @@
 # Instagram Bot to Like Photos
+
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
+import sys
 import time
+from termcolor import colored, cprint
+
 
 class InstagramBot:
 
-	def __init__(self, username, password):
-		self.username = username
-		self.password = password
-		self.driver = webdriver.Chrome('./chromedriver')
+    def __init__(self, username, password):
+        self.username = username
+        self.password = password
 
-	def closeBrowser(self):
-		self.driver.close()
+		# Google Chrome
+        self.driver = webdriver.Chrome('./chromedriver')
+		# Firefox
+        # self.driver = webdriver.Firefox('./geckodriver') 
 
-	def login(self):
-		driver = self.driver
-		driver.get('https://www.instagram.com/accounts/login')
+    def closeBrowser(self):
+        self.driver.close()
 
-		time.sleep(1)
-		username_field = driver.find_element_by_xpath("//input[@name='username']")		
-		username_field.clear()
-		username_field.send_keys(self.username)
+    def login(self):
+        driver = self.driver
+        cprint('\n- Opening Instagram login page...', 'yellow')
+        driver.get('https://www.instagram.com/accounts/login')
+        time.sleep(2)
 
-		password_field = driver.find_element_by_xpath("//input[@name='password']")
-		password_field.clear()
-		password_field.send_keys(self.password)
-		password_field.send_keys(Keys.RETURN)
+        cprint('\n- Setting up the username', 'yellow')
+        username_field = driver.find_element_by_xpath(
+            "//input[@name='username']")
+        username_field.clear()
+        username_field.send_keys(self.username)
 
-		time.sleep(1)
-	
-	def like(self, hashtag):
-		driver = self.driver
-		print('Searching for #' + hashtag + '\n\n')
-		driver.get('https://www.instagram.com/explore/tags/' + hashtag + '/')
+        cprint('- Setting up the password', 'yellow')
+        password_field = driver.find_element_by_xpath(
+            "//input[@name='password']")
+        password_field.clear()
+        password_field.send_keys(self.password)
+        password_field.send_keys(Keys.RETURN)
 
-		time.sleep(0.5)
+        time.sleep(2)
 
-		# Scrolling Down
-		for i in range (1, 100):
-			driver.execute_script('window.scrollTo(0, document.body.scrollHeight);')
-			time.sleep(0.2)
+    def like(self, hashtag):
+        driver = self.driver
 
-		print('Please, just wait a little...')
-		time.sleep(10)
+        cprint('\n - Going to check out the #' + hashtag + ' posts', 'yellow')
+        driver.get('https://www.instagram.com/explore/tags/' + hashtag + '/')
 
-		# Searching for picture link
-		hrefs = driver.find_elements_by_tag_name('a')
-		pic_links = []
+        cprint(' - Checking the posts on page. It can take a few seconds...', 'blue')
+        time.sleep(0.5)
 
-		for elem in hrefs:
+        # Scrolling Down
+        for i in range(1, 100):
+            driver.execute_script(
+                'window.scrollTo(0, document.body.scrollHeight);')
+            time.sleep(0.2)
 
-			try:
-				href = elem.get_attribute('href')
-				href.index('/p/')
-				pic_links.append(href)
-			except:
-				pass
-		
-		print(str(len(pic_links)) + ' photos found!\nLet\'s start liking...\n\n')
+        time.sleep(10)
 
-		for link in pic_links:
-			print('Going to photo: ' + str(link))
-			driver.get(link)
+        # Searching for picture link
+        hrefs = driver.find_elements_by_tag_name('a')
+        pic_links = []
 
-			like_button = driver.find_element_by_css_selector(".Slqrh span[aria-label='Like']")
-			time.sleep(0.1)
-			like_button.click()
+        for elem in hrefs:
 
-			time.sleep(0.1)
-				
+            try:
+                href = elem.get_attribute('href')
+                href.index('/p/')
+                pic_links.append(href)
+            except:
+                pass
 
-bot = InstagramBot('your_username', 'your_password')
+        cprint('- Photos found: ' + str(len(pic_links)), 'magenta')
+
+        for link in pic_links:
+            cprint('\n - Going to photo(url): ' + str(link), 'yellow')
+            driver.get(link)
+
+            time.sleep(1)
+
+            time.sleep(0.1)
+
+            like_buttons = driver.find_elements_by_css_selector(
+                ".Slqrh span[aria-label='Curtir']")
+
+            if (len(like_buttons) > 0):
+                like_buttons[0].click()
+                cprint('\n<3 Liked' + str(link), 'red')
+            else:
+                cprint('\nThere\'s no Like Button on this photo ( ' +
+                       str(link) + ' )', 'grey')
+
+            time.sleep(0.1)
+
+
+cprint('\n @ INSTAGRAM BOT IN ACTION', 'magenta')
+bot = InstagramBot('bycoffeeorg', '69!Perseveranc3#')
 bot.login()
 
-hashtags = ['your', 'hash', 'tags', 'here']
+hashtags = ['opensource', 'code', 'violao', 'vozeviolao', 'cantando', 'paisagem', 'diy',
+            'fails', 'thuglife', 'coffee', 'arduino', 'raspberry', 'programming', 'google', 'gdg']
 
 for hashtag in hashtags:
-	bot.like(hashtag)
+    bot.like(hashtag)
+
 
 bot.closeBrowser()
