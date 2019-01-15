@@ -97,7 +97,7 @@ class InstagramBot:
 
 
 cprint('\n @ INSTAGRAM BOT IN ACTION', 'magenta')
-bot = InstagramBot('bycoffeeorg', '69!Perseveranc3#')
+bot = InstagramBot('yourusername', 'yourpwd')
 bot.login()
 
 hashtags = ['opensource', 'code', 'violao', 'vozeviolao', 'cantando', 'paisagem', 'diy',
